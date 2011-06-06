@@ -1,0 +1,48 @@
+<?php
+
+include_once('kproject_punchui.features.inc');
+
+// add some feature-specific css, but just to the view at 'mytasks'
+function kproject_punchui_init() {
+  if (substr(drupal_get_destination(),12,7) == 'mytasks') {
+    drupal_add_css(drupal_get_path('module', 'kproject_punchui') . '/kproject_punchui.css');
+  }
+}
+
+function kproject_punchui_views_embed_form() {
+  return array(
+    // Key in this array is the name of a form and also the name of a form function.
+    // Value in this array is a human-readable name of the form, use t() to allow internationalization.
+    'kproject_punchui_form' => t('Task punch form'),
+    'kproject_punchui_header_form' => t('Header for punch list'),
+  );
+}
+
+function kproject_punchui_form(&$form_state, $fields) {
+  // $fields are from a view, useful when you need to know node id for this row. 
+  // It should be $fields->nid.
+  $form = ktimetracker_punch_form(&$form_state);
+  // populate the node field with the nid of the row
+  $form['nid']['#default_value'] = $fields->nid;
+  // remove the titles
+  $form['comment']['#title'] = "";
+  // we don't want the current punch comment here
+  $form['comment']['#default_value'] = "";
+  // hide some fields
+  $form['punched_in']['#type'] = "hidden";
+  $form['nid']['#type'] = "hidden";
+  $form['punchout']['#type'] = "hidden";
+  return $form;
+}
+
+function kproject_punchui_header_form(&$form_state, $fields) {
+  // $fields are from a view, useful when you need to know node id for this row. 
+  // It should be $fields->nid.
+  $form = ktimetracker_punch_form(&$form_state);
+  // hide some fields
+  $form['comment']['#type'] = "hidden";
+  $form['nid']['#type'] = "hidden";
+  $form['punchin']['#type'] = "hidden";
+  return $form;
+}
+
